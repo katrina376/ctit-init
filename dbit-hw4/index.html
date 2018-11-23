@@ -87,66 +87,65 @@
     };
 
     /* Event binding */
-    window.addEventListener('load', ev => {
-      /* Bind assessment event to get subtotal */
-      var assessments = $$('tr.assessment');
-      assessments.forEach(el => {
-        var method = el.getAttribute('data-method');
-        if (method === 'radio') {
-          /* change radio */
-          var options = $$('.coefficient input', el);
-          options.forEach(op => {
-            op.addEventListener('change', iev => {
-              var score = Number($('.score', el).innerText);
-              var coef = Number($('.coefficient input:checked', el).value);
-              $('.coefficient-display', el).innerText = coef;
-              $('.subtotal', el).innerText = coef * score;
-            });
-          });
-        } else if (method === 'text') {
-          /* finish text edition */
-          var input = $('.coefficient input', el);
-          input.addEventListener('change', iev => {
+
+    /* Bind assessment event to get subtotal */
+    var assessments = $$('tr.assessment');
+    assessments.forEach(el => {
+      var method = el.getAttribute('data-method');
+      if (method === 'radio') {
+        /* change radio */
+        var options = $$('.coefficient input', el);
+        options.forEach(op => {
+          op.addEventListener('change', ev => {
             var score = Number($('.score', el).innerText);
-            try {
-              var coef = Number(iev.target.value);
-              $('.subtotal', el).innerText = coef * score;
-            } catch (e) {
-              alert(e.message);
-            }
+            var coef = Number($('.coefficient input:checked', el).value);
+            $('.coefficient-display', el).innerText = coef;
+            $('.subtotal', el).innerText = coef * score;
           });
-        }
-      });
-
-      /* Bind submit event to get total */
-      $('#calculate').addEventListener('click', (ev) => {
-        /* prevent default action of submit */
-        ev.preventDefault();
-
-        var total = 0;
-        var isValid = true;
-        var msg = '';
-
-        var subtotals = $$('.assessment .subtotal');
-        for (var i = 0; i < subtotals.length; ++i) {
-          var el = subtotals[i];
-          var no = i + 1;
-
-          if (el.innerText.length === 0) {
-            isValid = false;
-            msg = '#' + no + ' is empty. Please fill in required data.';
-            break;
-          } else if (isNaN(el.innerText)) {
-            isValid = false;
-            msg = '#' + no + ' is not valid. Please fill in qualified data.';
-            break;
-          } else {
-            total += Number(el.innerText);
+        });
+      } else if (method === 'text') {
+        /* finish text edition */
+        var input = $('.coefficient input', el);
+        input.addEventListener('change', ev => {
+          var score = Number($('.score', el).innerText);
+          try {
+            var coef = Number(ev.target.value);
+            $('.subtotal', el).innerText = coef * score;
+          } catch (e) {
+            alert(e.message);
           }
-        }
+        });
+      }
+    });
 
-        $('#total').innerText = isValid ? total : msg;
-      });
+    /* Bind submit event to get total */
+    $('#calculate').addEventListener('click', ev => {
+      /* prevent default action of submit */
+      ev.preventDefault();
+
+      var total = 0;
+      var isValid = true;
+      var msg = '';
+
+      var subtotals = $$('.assessment .subtotal');
+      for (var i = 0; i < subtotals.length; ++i) {
+        var el = subtotals[i];
+        var no = i + 1;
+
+        if (el.innerText.length === 0) {
+          isValid = false;
+          msg = '#' + no + ' is empty. Please fill in required data.';
+          break;
+        } else if (isNaN(el.innerText)) {
+          isValid = false;
+          msg = '#' + no + ' is not valid. Please fill in qualified data.';
+          break;
+        } else {
+          total += Number(el.innerText);
+        }
+      }
+
+      $('#total').innerText = isValid ? total : msg;
     });
   </script>
 </body>

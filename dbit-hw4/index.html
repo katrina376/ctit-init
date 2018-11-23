@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Demonstrate some tips</title>
+  <style>
+    * {
+      font-size: 16px;
+      font-family: serif;
+    }
+    table, tr, td {
+      border: 1px #000 solid;
+      border-collapse: collapse;
+    }
+
+    table {
+      width: 100%;
+    }
+
+    td {
+      padding: 0.5em 1em;
+    }
+
+    thead td {
+      font-weight: bold;
+      text-align: center;
+    }
+
+    tr>td:nth-child(1){
+      text-align: center;
+    }
+
+    .number {
+      text-align: right;
+    }
+  </style>
+</head>
+
+<body>
+  <table>
+    <thead>
+      <tr>
+        <td colspan="5">This is the title of the table.</td>
+      </tr>
+      <tr>
+        <td>#</td>
+        <td>Score</td>
+        <td>Description</td>
+        <td>Coefficient</td>
+        <td>Subtotal</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="assessment" data-method="radio">
+        <td>1</td>
+        <td class="number score">30</td>
+        <td class="coefficient">
+          <input type="radio" name="a1" id="a1-1" value="1"> <label for="a1-1">Coefficient = 1</label><br />
+          <input type="radio" name="a1" id="a1-2" value="0.5"> <label for="a1-2">Coefficient = 0.5</label><br />
+          <input type="radio" name="a1" id="a1-3" value="0"> <label for="a1-3">Coefficient = 0</label>
+        </td>
+        <td class="number coefficient-display"></td>
+        <td class="number subtotal"></td>
+      </tr>
+      <tr class="assessment" data-method="text">
+        <td>2</td>
+        <td class="number score">20</td>
+        <td>Input the coefficient</td>
+        <td class="coefficient number"><input name="a2" class="number" /></td>
+        <td class="number subtotal"></td>
+      </tr>
+      <tr>
+        <td colspan="3"><button id="calculate">sum up</button></td>
+        <td colspan="2" id="total" class="number"></td>
+      </tr>
+    </tbody>
+  </table>
+  <script>
+    /* Handy selectors */
+    const $ = (s, parent) => {
+      var parent = parent || document;
+      return parent.querySelector(s);
+    }
+    const $$ = (s, parent) => {
+      var parent = parent || document;
+      return parent.querySelectorAll(s);
+    };
+
+    /* Event binding */
+    window.addEventListener('load', ev => {
+      /* Bind assessment event to get subtotal */
+      var assessments = $$('tr.assessment');
+      assessments.forEach(el => {
+        var method = el.getAttribute('data-method');
+        if (method === 'radio') {
+          /* change radio */
+          var options = $$('.coefficient input', el);
+          options.forEach(op => {
+            op.addEventListener('change', iev => {
+              var score = Number($('.score', el).innerText);
+              var coef = Number($('.coefficient input:checked', el).value);
+              $('.coefficient-display', el).innerText = coef;
+              $('.subtotal', el).innerText = coef * score;
+            });
+          });
+        } else if (method === 'text') {
+          /* finish text edition */
+          var input = $('.coefficient input', el);
+          input.addEventListener('change', iev => {
+            var score = Number($('.score', el).innerText);
+            try {
+              var coef = Number(iev.target.value);
+              $('.subtotal', el).innerText = coef * score;
+            } catch (e) {
+              alert(e.message);
+            }
+          });
+        }
+      });
+
+      /* Bind submit event to get total */
+      $('#calculate').addEventListener('click', (ev) => {
+        /* prevent default action of submit */
+        ev.preventDefault();
+
+        var total = 0;
+        var isValid = true;
+        var msg = '';
+
+        var subtotals = $$('.assessment .subtotal');
+        for (var i = 0; i < subtotals.length; ++i) {
+          var el = subtotals[i];
+          var no = i + 1;
+
+          if (el.innerText.length === 0) {
+            isValid = false;
+            msg = '#' + no + ' is empty. Please fill in required data.';
+            break;
+          } else if (isNaN(el.innerText)) {
+            isValid = false;
+            msg = '#' + no + ' is not valid. Please fill in qualified data.';
+            break;
+          } else {
+            total += Number(el.innerText);
+          }
+        }
+
+        $('#total').innerText = isValid ? total : msg;
+      });
+    });
+  </script>
+</body>
+
+</html>

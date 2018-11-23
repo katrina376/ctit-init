@@ -5,32 +5,41 @@
   <title>Demonstrate some tips</title>
   <style>
     * {
+      /* set universal font style */
       font-size: 16px;
       font-family: serif;
     }
+
     table, tr, td {
+      /* set the border style of table elements */
       border: 1px #000 solid;
       border-collapse: collapse;
     }
 
     table {
+      /* make the width of tables same as the body */
       width: 100%;
     }
 
     td {
+      /* set paddings; up and down to 0.5em; left and right to 1em */
       padding: 0.5em 1em;
     }
 
     thead td {
+      /* make text of `td`s belonging to `thead` bold and center-aligned */
+      /* thead refers to table head */
       font-weight: bold;
       text-align: center;
     }
 
     tr>td:nth-child(1){
+      /* select the first `td` in all `tr`s */
       text-align: center;
     }
 
     .number {
+      /* select all elements of class number */
       text-align: right;
     }
   </style>
@@ -77,24 +86,33 @@
   </table>
   <script>
     /* Handy selectors */
+
+    /* single element selector */
     const $ = (s, parent) => {
       var parent = parent || document;
       return parent.querySelector(s);
     }
+
+    /* multiple elements selector */
     const $$ = (s, parent) => {
       var parent = parent || document;
       return parent.querySelectorAll(s);
-    };
+    }
 
     /* Event binding */
 
     /* Bind assessment event to get subtotal */
     var assessments = $$('tr.assessment');
+
     assessments.forEach(el => {
       var method = el.getAttribute('data-method');
+      // customized attribute of `tr`s
+
       if (method === 'radio') {
         /* change radio */
         var options = $$('.coefficient input', el);
+        // get radio buttons inside the `tr` element
+
         options.forEach(op => {
           op.addEventListener('change', ev => {
             var score = Number($('.score', el).innerText);
@@ -128,15 +146,18 @@
       var msg = '';
 
       var subtotals = $$('.assessment .subtotal');
+
       for (var i = 0; i < subtotals.length; ++i) {
         var el = subtotals[i];
         var no = i + 1;
 
         if (el.innerText.length === 0) {
+          /* empty coefficient */
           isValid = false;
           msg = '#' + no + ' is empty. Please fill in required data.';
           break;
         } else if (isNaN(el.innerText)) {
+          /* NaN subtopic */
           isValid = false;
           msg = '#' + no + ' is not valid. Please fill in qualified data.';
           break;
@@ -145,7 +166,9 @@
         }
       }
 
+      /* update the result */
       $('#total').innerText = isValid ? total : msg;
+      // if the result is valid, show the total; else, show the error message
     });
   </script>
 </body>

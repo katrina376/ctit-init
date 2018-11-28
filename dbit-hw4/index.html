@@ -78,6 +78,18 @@
         <td class="coefficient number"><input name="a2" class="number" /></td>
         <td class="number subtotal"></td>
       </tr>
+      <tr class="assessment" data-method="radio" data-dynamic="a3">
+        <td>3</td>
+        <td class="number score">50</td>
+        <td class="coefficient">
+          <input type="radio" name="a3" id="a3-1" value="0"> <label for="a3-1">Coefficient = 0 if N >= 1</label><br />
+          <input type="radio" name="a3" id="a3-2" value=""> <label for="a3-2">Coefficient = (1 - N) if N > 0 and N < 1</label><br />
+          <input type="radio" name="a3" id="a3-3" value="1"> <label for="a3-3">Coefficient = 1 if N <= 0</label><br />
+          N = <input name="a3-param" id="a3-param" class="number param" />
+        </td>
+        <td class="number coefficient-display"></td>
+        <td class="number subtotal"></td>
+      </tr>
       <tr>
         <td colspan="3"><button id="calculate">sum up</button></td>
         <td colspan="2" id="total" class="number"></td>
@@ -85,6 +97,20 @@
     </tbody>
   </table>
   <script>
+    /* Special cases */
+    const DYNAMIC_CASES = {
+      'a3': param => {
+        if (param >= 1) {
+          return {'target': '#a3-1', 'value': 0};
+        } else if (param <= 0) {
+          return {'target': '#a3-3', 'value': 1};
+        } else {
+          return {'target': '#a3-2', 'value': 1 - param};
+        }
+      },
+    }
+    
+    
     /* Handy selectors */
 
     /* single element selector */
@@ -132,6 +158,21 @@
           } catch (e) {
             alert(e.message);
           }
+        });
+      }
+      
+      /* special case for dynamic radio values */
+      if (el.hasAttribute('data-dynamic')) {
+        var key = el.getAttribute('data-dynamic');
+        
+        $('.coefficient .param', el).addEventListener('input', ev => {
+          // update at every input event (earlier than change event)
+          var param = Number(ev.target.value);
+          var func = DYNAMIC_CASES[key];
+          var ret = func(param);
+          
+          $(ret.target).checked = true;
+          $(ret.target).value = ret.value;
         });
       }
     });
